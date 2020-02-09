@@ -50,6 +50,7 @@ FSAMP = 48000       # Sampling frequency in Hz
 FRAME_SIZE = 2048   # How many samples per frame?
 FRAMES_PER_FFT = 32 # FFT takes average across how many frames?
 DEVICE_NAME_PLAY = 'USB Audio Device: - (hw:3,0)'
+CACHE_PATH = 'exp_data/20200208/C3.pkl'
 
 ######################################################################
 # Derived quantities from constants above. Note that as
@@ -88,7 +89,7 @@ print('sampling at', FSAMP, 'Hz with max resolution of', FREQ_STEP, 'Hz')
 
 p = pyaudio.PyAudio()
 
-cache = load('test.pkl')
+cache = load(CACHE_PATH)
 print(f'Cache length is {len(cache)}')
 
 wavFile = wave.open('test.wav', 'wb')

@@ -34,6 +34,7 @@ DEVICE_NAME_REC = 'USB Audio Device: - (hw:2,0)'
 # WAV_FILE = 'whitenoise_1k_12db.wav'
 WAV_FILE = 'whitenoise.wav'
 # WAV_FILE = sys.argv[1]
+DIR = 'exp_data/20200208'
 NAME = 'F#5'
 DURATION = 20.
 PREPARE_DURATION = 3
@@ -161,8 +162,10 @@ while time.time() - start_time < DURATION:
         #     print('Pickled cache was dumped "{NAME}".')
         break
 
-if not os.path.exists(f'{NAME}.pkl'):
-    dump(f'{NAME}.pkl', cache)
-    print(f'Pickled cache was dumped "{NAME}".')
+os.makedirs(DIR, exist_ok=True)
+pkl_path = f'{DIR}/{NAME}.pkl'
+if not os.path.exists(pkl_path):
+    dump(pkl_path, cache)
+    print(f'Pickled cache was dumped "{pkl_path}".')
 else:
-    print(f'{NAME} already exists.')
+    print(f'{pkl_path} already exists.')

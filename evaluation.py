@@ -13,7 +13,9 @@ from sklearn.metrics import plot_confusion_matrix
 from utils import *
 
 FRAME_SIZE = 1024
-DIR = '20200208'
+DATA_DIR = 'exp_data/20200208'
+RESULT_DIR = 'result/20200208'
+
 # NAMES = ['D3',
 #          'D4',
 #          'G3',
@@ -26,7 +28,7 @@ SCALE = 1e10
 FSAMP = 48000
 FREQ_STEP = float(FSAMP)/FRAME_SIZE
 # file_names = [f'{DIR}/{x}.pkl' for x in NAMES]
-file_names = glob(f'{DIR}/*3.pkl')
+file_names = glob(f'{DATA_DIR}/*3.pkl')
 
 names = [os.path.basename(x).split('.')[0] for x in file_names]
 nclasses = len(names)
@@ -84,8 +86,8 @@ disp = plot_confusion_matrix(clf, teX, teY,
 
 # disp.figure_.sa
 print(f'Mean accuracy {score}')
-disp.figure_.savefig('confusion.png')
 
-dump('lr.pkl', clf)
-# np.save(f'x_{FRAME_SIZE}.npy', X)
-# np.save(f'y_{FRAME_SIZE}.npy', y)
+# save
+os.makedirs(RESULT_DIR, exist_ok=True)
+disp.figure_.savefig(f'{RESULT_DIR}/confusion.png')
+dump(f'{RESULT_DIR}/clf.pkl', clf)
