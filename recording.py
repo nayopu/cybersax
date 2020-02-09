@@ -15,7 +15,7 @@ import time
 import numpy as np
 import pyaudio
 import wave
-from utils import dump
+from modules.utils import dump
 ######################################################################
 # Feel free to play with these numbers. Might want to change NOTE_MIN
 # and NOTE_MAX especially for guitar/bass. Probably want to keep

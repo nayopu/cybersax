@@ -2,7 +2,7 @@
 from glob import glob
 import numpy as np
 import threading
-from utils import load
+from modules.utils import load
 import time
 import wave
 import os
@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import plot_confusion_matrix
-from utils import *
+from modules.utils import *
 
 FRAME_SIZE = 1024
 DATA_DIR = 'exp_data/20200208'
-RESULT_DIR = 'result/20200208'
+RESULT_DIR = 'exp_data/20200208'
 
 # NAMES = ['D3',
 #          'D4',
