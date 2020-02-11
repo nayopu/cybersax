@@ -1,7 +1,0 @@
-setup.py
-swipe.c
-vector.c
-swipe.egg-info/PKG-INFO
-swipe.egg-info/SOURCES.txt
-swipe.egg-info/dependency_links.txt
-swipe.egg-info/top_level.txt
