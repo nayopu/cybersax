@@ -10,7 +10,7 @@ __version__ = "1.1.0"
 
 """
 ***********************************************************************
-Name            : yin.py
+Name            : yin-python.py
 Description     : Fundamental frequency estimation. Based on the YIN alorgorithm [1]: De Cheveigné, A., & Kawahara, H. (2002). YIN, a fundamental frequency estimator for speech and music. The Journal of the Acoustical Society of America, 111(4), 1917-1930.
 Author          : Patrice Guyot. Previous works on the implementation of the YIN algorithm have been made thanks to Robin Larvor, Maxime Le Coz and Lionel Koenig.
 ***********************************************************************
@@ -165,7 +165,7 @@ def compute_yin(sig, sr, dataFileName=None, w_len=512, w_step=256, f0_min=100, f
     :rtype: tuple
     """
 
-    print('Yin: compute yin algorithm')
+    print('Yin: compute yin-python algorithm')
     tau_min = int(sr / f0_max)
     tau_max = int(sr / f0_min)
 

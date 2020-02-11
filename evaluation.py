@@ -18,7 +18,7 @@ HARM_THRES = 0.85
 
 data_fps = glob(os.path.join(DATA_DIR, '*'))
 
-# yin
+# yin-python
 for data_fp in data_fps:
 
     sr, sig = audio_read(data_fp, formatsox=False)
