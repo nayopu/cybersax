@@ -2,28 +2,68 @@
 from glob import glob
 import os
 
-import matlab.engine
+import pandas as pd
+import numpy as np
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay, accuracy_score
 
-from ext_src.yin.audio_processing import audio_read
-from ext_src.yin.yin import compute_yin
+from modules.utils import *
 
-DATA_DIR = 'processed/20200208_wav_eval/test'
-RESULT_DIR = 'result/20200208'
-HOP_DUR = 1e-3
-TRACEBACK_DIR = 3e-2
-F_MIN = 130
-F_MAX = 900
-HARM_THRES = 0.85
+YIN_CSV = 'result/csvs/yin.csv'
+SWIPE_CSV = 'result/csvs/swipe.csv'
+DIO_CSV = 'result/csvs/dio.csv'
+LR_CSV = 'result/pred_csv/lr.csv'
+LABEL_PKL = 'processed/20200208_wav_test_concat/gt_dict.pkl'
+RESULT_DIR = 'result/scores'
 
+W_DUR = 0.03
+INTERVAL_DUR = 0.01
+SAMP_RATE = 48000
 
-data_fps = glob(os.path.join(DATA_DIR, '*'))
+wsize = SAMP_RATE * W_DUR
+isize = SAMP_RATE * INTERVAL_DUR
 
-# yin-python
-for data_fp in data_fps:
+df_yin = pd.read_csv(YIN_CSV, header=None)  # 32000
+df_swipe = pd.read_csv(SWIPE_CSV, header=None)  # 32001
+df_dio = pd.read_csv(DIO_CSV, header=None) # 320001
+df_lr = pd.read_csv(LR_CSV, header=None)  # 31977
 
-    sr, sig = audio_read(data_fp, formatsox=False)
-    hop_size = int(sr * HOP_DUR)
-    traceback_size = int(sr * TRACEBACK_DIR)
-    pitches, harmonic_rates, argmins, times = compute_yin(sig, sr, None, traceback_size, hop_size, F_MIN, F_MAX, HARM_THRES)
+nsamples = len(df_yin)
+# print('nresults', ', '.join([f'{len(df)}' for df in [df_yin, df_swipe, df_dio, df_lr]]))
 
-    print('done')
+# prcess dataframes
+## drop
+df_swipe = df_swipe.drop(0)
+df_dio = df_dio.drop(0)
+## fill
+df_yin = df_yin.fillna(method='ffill').fillna(method='bfill')
+last_row = df_lr.index[-1]
+for i in range(len(df_lr), nsamples):
+    df_lr.loc[i] = df_lr.loc[last_row]
+
+freqs_np = np.array(FREQS)
+def get_nearest_tone_class(freq):
+    return np.argmin(np.abs(freqs_np - freq))
+
+# class prediction
+pred_yin = df_yin[0].apply(get_nearest_tone_class).values
+pred_swipe = df_swipe[0].apply(get_nearest_tone_class).values
+pred_dio = df_dio[0].apply(get_nearest_tone_class).values
+pred_lr = df_lr[0].values
+pred_dict = {'yin': pred_yin, 'swipe': pred_swipe, 'dio': pred_dio, 'lr': pred_lr}
+
+# ground truth
+time_positions = load(LABEL_PKL)
+gt = np.zeros(nsamples).astype(np.int)
+for class_, tone in enumerate(TONES):
+    start = int(time_positions[tone][0] / 1000 / INTERVAL_DUR)
+    end = int(time_positions[tone][1] / 1000 / INTERVAL_DUR)
+    gt[start:end] = class_
+labels = [TONES[x] for x in gt]
+# confution matrix
+os.makedirs(RESULT_DIR, exist_ok=True)
+for k in pred_dict:
+    cm = confusion_matrix(gt, pred_dict[k])
+    disp = ConfusionMatrixDisplay(cm, k).plot()
+    acc = accuracy_score(gt, pred_dict[k])
+    disp.figure_.savefig(f'{RESULT_DIR}/confusion_{k}.png')
+    print(f'Accuracy of {k}: {acc}')
